@@ -1,0 +1,91 @@
+.aifs-review {
+  padding: 1.5%;
+}
+
+.aifs-review-box {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  margin-bottom: 1%;
+}
+
+.aifs-review-box p {
+  font-size: 1.25em;
+  color: #000000;
+}
+
+.aifs-notice-img-left {
+  float: left;
+  width: 70px;
+  height: 70px;
+  margin-right: 10px;
+}
+
+.aifs-notice-img-right {
+  width: 70px;
+  height: 70px;
+  margin-left: 20px;  
+}
+
+a.aifs-review-now.aifs-review-button {
+  background: #399642;
+  color: #ffffff;
+}
+
+a.aifs-review-now.aifs-review-button:hover {
+  background: #46b450;
+  color: #ffffff;
+}
+
+a.aifs-review-button {
+  background: #e5e5e5;
+  text-decoration: none;
+  padding: 7px 15px;
+  margin-right: 15px;
+  border-radius: 5px;
+}
+
+.block-body{
+	vertical-align: text-top;
+	margin-top: 0%;
+	padding-top: 0%;
+	padding-bottom: 1%;
+}
+
+.block-title{
+	
+}
+
+.header-footer{
+	background: #000000; 
+	color: #ffffff;
+	padding: 1px;
+}
+
+.header-footer p, .header-footer-issue-ssl p{
+	margin-left: 15px;
+}
+
+.header-footer a{
+	color: #ffffff;
+}
+
+.header-footer a:hover{
+	text-decoration: none;
+	color: #ffff00;
+}
+
+.header-footer-issue-ssl{
+    background: #ffffff; 
+    color: #000000;
+    padding: 1px;
+}
+
+.header-footer-issue-ssl a{
+	color: #399642;
+}
+
+.header-footer-issue-ssl a:hover{
+	text-decoration: none;
+	color: #000000;
+}
