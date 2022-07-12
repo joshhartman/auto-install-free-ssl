@@ -10,6 +10,7 @@
  * Author URI:  https://freessl.tech
  * License:     GNU General Public License, version 3
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
+ * Update URI:  false
  * Text Domain: auto-install-free-ssl
  * Domain Path: /languages/
  * Network:     true
