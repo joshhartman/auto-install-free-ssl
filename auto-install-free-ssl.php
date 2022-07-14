@@ -5,7 +5,7 @@
  * Plugin Name: Auto-Install Free SSL
  * Plugin URI:  https://freessl.tech
  * Description: This plugin automatically issues and installs free SSL certificates in cPanel shared hosting. You need only a few clicks to set it up. Cost $000
- * Version:     2.2.3
+ * Version:     2.2.4
  * Author:      Free SSL Dot Tech
  * Author URI:  https://freessl.tech
  * License:     GNU General Public License, version 3
