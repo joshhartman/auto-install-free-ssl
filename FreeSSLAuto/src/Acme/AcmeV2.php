@@ -510,7 +510,7 @@ class AcmeV2
             while (1) {
                 //$this->client->getLastLinks();
 
-                $result = $this->client->get($location);
+                $fullchain = $this->client->get($location);
 
                 $this->logger->log('Location value: '.$location);
 
@@ -520,7 +520,7 @@ class AcmeV2
                 } elseif (200 === $this->client->getLastCode()) {
                     $this->logger->log('Got certificate! YAY!');
 
-                    $certificates = explode("\n\n", $result);
+                    $certificates = $this->splitFullChain( $fullchain );
 
                     break;
                 } else {
@@ -528,18 +528,18 @@ class AcmeV2
                 }
             }
 
-            if (empty($certificates)) {
+            if ( empty( $fullchain ) || empty( $certificates ) ) {
                 throw new \RuntimeException('No certificates generated');
             }
 
             $this->logger->log('Saving Certificate (CRT) certificate.pem');
-            file_put_contents($domainPath.DS.'certificate.pem', $certificates[0]);
+            file_put_contents($domainPath.DS.'certificate.pem', $certificates['certificate']);
 
             $this->logger->log('Saving (CABUNDLE) cabundle.pem');
-            file_put_contents($domainPath.DS.'cabundle.pem', $certificates[1]);
+            file_put_contents($domainPath.DS.'cabundle.pem', $certificates['cabundle']);
 
             $this->logger->log('Saving fullchain.pem');
-            file_put_contents($domainPath.DS.'fullchain.pem', $result);
+            file_put_contents($domainPath.DS.'fullchain.pem', $fullchain);
 
             $this->logger->log("Done!!!! Let's Encrypt ACME V2 SSL certificate successfully issued!!");
 
@@ -551,7 +551,29 @@ class AcmeV2
         return false;
     }
   
-    
+    /**
+     * Split fullchain.pem into EE cert and CA bundle (intermediate + root).
+     * cPanel's installssl API requires the CA bundle to include the root.
+     *
+     * @param string $fullchain  The raw PEM content of fullchain.pem
+     * @return array ['certificate' => string, 'cabundle' => string]
+     */
+    function splitFullChain( $fullchain ) {
+        // Extract all PEM blocks
+        preg_match_all( '/-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----/s', $fullchain, $matches );
+        $certs = $matches[0];
+        if ( count( $certs ) < 2 ) {
+            throw new \RuntimeException('Full chain must contain at least 2 certificates.');
+        }
+        $certificate = $certs[0];
+        // [1] End-Entity (EE) / Leaf Certificate
+        $cabundle = implode( "\n\n", array_slice( $certs, 1 ) );
+        // [2] Intermediate CA Certificate + [3] Root CA Certificate + ...
+        return [
+            'certificate' => $certificate,
+            'cabundle'    => $cabundle,
+        ];
+    }
 
     /**
      * Method to revoke SSL certifiate.
