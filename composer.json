@@ -3,13 +3,6 @@
     "description": "This plugin automatically issues and installs free SSL certificates in cPanel shared hosting. You need only a few clicks to set it up. Cost $000",
     "type": "project",
     "license": "GNU General Public License, version 3",
-    "authors": [
-        {
-            "name": "Free SSL Dot Tech",
-            "email": "support@freessl.tech",
-            "homepage": "https://freessl.tech"
-        }
-    ],
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
