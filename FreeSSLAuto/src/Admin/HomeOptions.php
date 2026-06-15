@@ -357,24 +357,7 @@ class HomeOptions
                     </td>
             <?php } ?>
                 </tr>
-            </table>   
-        <!-- Powered by -->    		
-    		<?php 
-    		  if($version_base === 5){
-    		      $style = 'class="header-footer"';
-    		  }
-    		  else{
-    		      $style = 'id="message" class="updated below-h2 header-footer"';
-    		  }
-    		
-    		?>
-    		
-    		<div <?= $style; ?> style="margin-top: 2%;">
-              	<p>
-              		<?php echo esc_html__("Need help", 'auto-install-free-ssl'); ?>? <a href="https://freessl.tech/free-ssl-certificate-for-wordpress-website/#help" target="_blank">Click here!</a> <span style="margin-left: 15%;"><?php echo esc_html__("For documentation", 'auto-install-free-ssl'); ?>, <a href="https://freessl.tech/free-ssl-certificate-for-wordpress-website/#documentation" target="_blank">click here</a>.</span> <span style="margin-left: 15%;"><?php echo esc_html__("To report a bug", 'auto-install-free-ssl'); ?>, <a href="https://freessl.tech/ap/contact-us" target="_blank">click here</a>.</span>
-              	</p>
-          	</div> <!-- End Powered by -->
-          	
+            </table>          	
           	
         </div>
         <?php
