@@ -1,14 +1,11 @@
 === Free SSL Certificate Plugin for WordPress – Auto-Install Free SSL, Force HTTPS Redirect ===
-Contributors: speedify, freessl
-Donate link: https://www.paypal.me/site4author
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Tags: ssl,https,free ssl,ssl certificate,mixed content
 Requires at least: 4.1
 Tested up to: 5.9
-Stable tag: 2.2.5
+Stable tag: 2026.1.0
 Requires PHP: 5.6
-Development location: https://freessl.tech
 
 WordPress plugin to automate issue & install free SSL certificates (Let's Encrypt), one-click force HTTPS redirect, fix insecure mixed content.
 
@@ -18,16 +15,11 @@ WordPress plugin to automate issue & install free SSL certificates (Let's Encryp
 
 'Auto-Install Free SSL' automatically issues, renews and installs Let’s Encrypt™ Free SSL Certificate on WordPress website & also on all the websites hosted in a cPanel server.
 
-https://www.youtube.com/watch?v=tYIOHsuY-HE
-
 This WordPress plugin works in cPanel shared hosting. You don't need to have coding experience or server admin experience to set it up. Root access is NOT required. All you need is 8 minutes only. Install it, provide a few required information, and set up the daily cron job. **You can even set up the cron job from this plugin with a single click.** That's it!
 
 This WordPress plugin works on other web hosting control panels also, except for the auto-installation feature.
 
-`This plugin supports Linux hosting 
-but doesn't work with Windows hosting.`
-
-## 112,500+ downloads
+`This plugin supports Linux hosting but doesn't work with Windows hosting.`
 
 ### Key Features
 
@@ -56,7 +48,7 @@ but doesn't work with Windows hosting.`
 
 #### Minimum System Requirements
 
-* Linux hosting (windows hosting is not supported)
+* Linux hosting (Windows hosting is not supported)
 * WordPress 4.1
 * PHP 5.6
 * OpenSSL extension
@@ -97,11 +89,6 @@ For any of the case 1 and 2, all other processes are automated. The plugin sends
 1. Then go to the plugin's dashboard. Click the **'Activate Force HTTPS'** button (this button will be visible only after the plugin issue an SSL certificate). This one-click makes sure your website has no mixed content warning. Now the padlock appears in the browser's address bar.
 1. Congratulations! You're all set.
 
-=== Support and Report a Bug ===
-
-Please check the existing topics in the WordPress [support forum](https://wordpress.org/support/plugin/auto-install-free-ssl) before creating a new topic for support or reporting a bug.
-
-
 == Frequently Asked Questions ==
 
 = Why do you need my cPanel password when others Let's Encrypt clients don’t? =
@@ -133,92 +120,9 @@ Please click the 'Cron Jobs' option in your cPanel. You'll get the 'Cron Jobs' p
 
 Make sure you have provided your email in the 'Cron Email' section of the Cron Jobs page of cPanel.
 
-
-=== Credits ===
-* [Let's Encrypt™](https://letsencrypt.org)
-* I developed this plugin based on the PHP client/app ['FreeSSL.tech Auto'](https://freessl.tech), which I developed with a massive rewrite of [Lescript](https://github.com/analogic/lescript).
-* [cPanel](https://cpanel.com)
-
-
 Let's Encrypt™ is a trademark of the Internet Security Research Group. All rights reserved.
-
-=== Screenshots ===
-1. Admin Menu of 'Auto-Install Free SSL'
-2. The dashboard of the plugin
-3. Basic Settings page
-4. cPanel Settings page
-5. Exclude Domains / Sub-domains page
-6. DNS Service Providers (index)
-7. Add New DNS Service Provider
-8. Add Cron Job
-9. Email confirmation when the plugin issue and install a free SSL certificate
-10. Activate Force HTTPS and get the padlock with one-click
-11. Automated email with a link to revert to HTTP
-12. Revert to HTTP option in the plugin dashboard
-
 
 == Changelog ==
 
-= 2.2.5 =
+= 2026.1.0 =
 * Fix: The CA bundle now always includes the root certificate. Previously, only the intermediate certificate was included in the CA bundle, which caused installation failures on hosting servers (including cPanel servers) where the root certificate was not present in the local trust store. This fix also ensures correct handling of Let's Encrypt's newer Generation Y chains, which can contain more than three certificates.
-
-= 2.2.4 =
-* Disabled plugin updates.
-
-= 2.2.3 =
-* Fixed conflict with admin page CSS class of WordPress 5.9.
-
-= 2.2.2 =
-* Fixed conflict with 'Post SMTP Mailer/Email Log' plugin.
-* Fixed an issue to make it translation ready.
-* Announcement to restructure the features.
-
-= 2.2.1 =
-* Removes parameter type declaration of the function connect_over_ssl() to make the plugin compatible with PHP 5.6. This function has been added in the version 2.2.0.
-
-= 2.2.0 =
-* Adds validation with the Activate Force HTTPS option. Now it works only if a valid SSL installed on the website.
-* Changed the support link that appears in the footer of the admin pages.
-
-= 2.1.7 =
-* Fixed a bug with 'Issue and install Free SSL certificate' option
-* Improved the layout of 'Issue and install Free SSL certificate' option
-
-= 2.1.6 =
-* Adds video guide: How to Configure this Plugin and set up Automation
-
-= 2.1.5 =
-* Fixed minor error in the file DnsServiceProvidersSettings.php that throws PHP Notice: Undefined index: use_wildcard
-
-= 2.1.4 =
-* Improves 'Add Cron Job' option.
-* Adds two video guides: 'How to add a Cron Job in a minute on cPanel shared hosting' and 'How to Install Free SSL Certificate on cPanel Shared Hosting'.
-* Adds FAQ.
-
-= 2.1.3 =
-* Improves Force HTTPS feature. Regenerating dynamic CSS with premium themes will include HTTPS and remove the not secure warning in browsers.
-
-= 2.1.2 =
-* Fixed a bug with the dashboard of Auto-Install Free SSL.
-
-= 2.1.1 =
-* Fixed issue with the encryption key.
-* Adds admin notification and sends an email to admin in case the encryption key was changed due to a previous update.
-
-= 2.1.0 =
-* Improves internal validation (HTTP-01 challenge) - Before the domain ownership validation with Let's Encrypt, if the payload content doesn't match with content of the challenge URI (in internal check), attempt for automatic fix with .htaccess rules in two different ways. 
-* Improves cPanel Settings option.
-* Improves Temporary SSL option.
-
-= 2.0.1 =
-* Fixed issues with PHP 5.6, 7.0 and 7.2
-
-= 2.0.0 =
-* Adds the option to activate force HTTPS and remove mixed content warning with a single click. This feature will make the padlock visible in the browser's address bar.
-* Removes the option to choose Let's Encrypt ACME version. The plugin now uses ACME V2 only. Because V1 is reaching the end of life soon.
-
-= 1.1.0 =
-* Fixed issue with cron job
-
-= 1.0.0 =
-* Initial release
