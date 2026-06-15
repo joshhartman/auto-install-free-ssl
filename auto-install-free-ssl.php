@@ -3,11 +3,9 @@
  * @package Auto-Install Free SSL
  * 
  * Plugin Name: Auto-Install Free SSL
- * Plugin URI:  https://freessl.tech
  * Description: This plugin automatically issues and installs free SSL certificates in cPanel shared hosting. You need only a few clicks to set it up. Cost $000
- * Version:     2.2.5
- * Author:      Free SSL Dot Tech
- * Author URI:  https://freessl.tech
+ * Version:     2026.1.0
+ * Author:      Auto-Install Free SSL
  * License:     GNU General Public License, version 3
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  * Update URI:  false
@@ -16,12 +14,9 @@
  * Network:     true
  * Tags:        free ssl certificate,lets encrypt,ssl,https,free ssl,ssl certificate,force ssl,mixed content,insecure content
  * 
- * @author      Free SSL Dot Tech
+ * @author      Auto-Install Free SSL
  * @category    Plugin
  * @license     http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License version 3 or higher
- * 
- * @copyright  Copyright (C) 2019-2022, Anindya Sundar Mandal - anindya@SpeedUpWebsite.info
- * 
  * 
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
