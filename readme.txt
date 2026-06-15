@@ -6,7 +6,7 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Tags: ssl,https,free ssl,ssl certificate,mixed content
 Requires at least: 4.1
 Tested up to: 5.9
-Stable tag: 2.2.4
+Stable tag: 2.2.5
 Requires PHP: 5.6
 Development location: https://freessl.tech
 
@@ -159,7 +159,10 @@ Let's Encrypt™ is a trademark of the Internet Security Research Group. All rig
 
 == Changelog ==
 
-= 2.2.3 =
+= 2.2.5 =
+* Fix: The CA bundle now always includes the root certificate. Previously, only the intermediate certificate was included in the CA bundle, which caused installation failures on hosting servers (including cPanel servers) where the root certificate was not present in the local trust store. This fix also ensures correct handling of Let's Encrypt's newer Generation Y chains, which can contain more than three certificates.
+
+= 2.2.4 =
 * Disabled plugin updates.
 
 = 2.2.3 =
