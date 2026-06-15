@@ -4,11 +4,8 @@
  * @package Auto-Install Free SSL
  * This package is a WordPress Plugin. It issues and installs free SSL certificates in cPanel shared hosting with complete automation.
  *
- * @author Free SSL Dot Tech <support@freessl.tech>
- * @copyright  Copyright (C) 2019-2020, Anindya Sundar Mandal
+ * @author Auto-Install Free SSL
  * @license    http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License, version 3
- * @link       https://freessl.tech
- * @since      Class available since Release 1.0.0
  *
  *
  *   This program is free software: you can redistribute it and/or modify
@@ -42,36 +39,6 @@ class Email
         
     }
     
-    /**
-     * Add review request in automated email notification
-     * @return string
-     *
-     * @since 2.0.0
-     */
-    public function add_review_request_in_email(){
-        
-        $display_review = get_option( 'aifs_display_review' );
-        
-        if ($display_review != false && $display_review != 0) { //If aifs_display_review is set to 1, add the review request
-            
-            $admin_email = get_option('admin_email');        
-            $admin = get_user_by('email', $admin_email);
-            $admin_first_name = $admin->first_name;
-            
-            $html = "<div style='background-color: #000000; padding: 15px; margin-bottom: 18px;'>
-                            <div style='color: #FFFF00; font-size: 1.25em; margin-bottom: 16px;'>
-                                " . __('Hey', 'auto-install-free-ssl' ) .' '.$admin_first_name. ', <strong>' . AIFS_NAME . '</strong> ' . __( 'has saved your $$$ by providing Free SSL Certificates and will save more. Could you please do me a BIG favor and give it a 5-star rating on WordPress? To help me spread the word and boost my motivation.', 'auto-install-free-ssl' ) . " <br />~Anindya
-                            </div>
-                            <a style='background: #399642; color: #ffffff; text-decoration: none; padding: 7px 15px; border-radius: 5px;' href='https://wordpress.org/support/plugin/auto-install-free-ssl/reviews/#new-post' target='_blank'>Sure! You Deserve It.</a>
-                      </div>";
-        }
-        else{
-            $html = "";
-        }
-        
-        return $html;
-    }
-    
     
     /**
      * Add email signature
@@ -85,8 +52,7 @@ class Email
         Do not reply to this automated email.<br /><br />
         --------------<br />
         Regards,<br />
-        Team <strong>".AIFS_NAME."</strong><br />
-        Powered by <a href='https://getwww.me'>GetWWW.me</a> (Beautiful WordPress website design service) and <a href='https://speedify.tech/wordpress-website-speed-optimization-service'>SpeedUpWebsite.info</a> (WordPress website speed optimization service)<br />";
+        Team <strong>".AIFS_NAME."</strong><br />";
         
         return $html;
     }
@@ -165,7 +131,7 @@ class Email
                 $body_log[] = 'The SSL files have been saved at the locations given below (web hosting log in required to access)';
             } else {
                 $subject = "'".AIFS_NAME."' generated ${issuerShort} SSL for ".$domain;
-                $body .= "<h2><a href='https://freessl.tech'>".AIFS_NAME."</a> generated ${issuerShort} SSL for ".$domain.'</h2><br />';
+                $body .= "<h2>".AIFS_NAME." generated ${issuerShort} SSL for ".$domain.'</h2><br />';
                 $body .= "Congrats! '".AIFS_NAME."' has successfully generated the ${issuerShort} SSL for ".$domain.'. <br /><br />
                                 <strong>But there was a problem installing the SSL. Please visit this plugin\'s dashboard and scroll down. We have put a video guide there just now: How to Install Free SSL Certificate on cPanel Shared Hosting.</strong><br /><br />
                                 Please find the SSL files at the locations given below (web hosting log in required to access) and install SSL manually.<br />';
@@ -177,7 +143,7 @@ class Email
             //Send email with paths of SSL and CA bundle,
             //but do not attach private key. Send the location instead
             $subject = "'".AIFS_NAME."' generated ${issuerShort} SSL for ".$domain;
-            $body .= "<h2><a href='https://freessl.tech'>".AIFS_NAME."</a> generated ${issuerShort} SSL for ".$domain.'</h2><br />';
+            $body .= "<h2>".AIFS_NAME." generated ${issuerShort} SSL for ".$domain.'</h2><br />';
             $body .= "Congrats! '".AIFS_NAME."' has successfully generated the ${issuerShort} SSL for ".$domain.". <br /><br />
                             <strong>But the SSL was not installed automatically, because you don't have an SSL installation feature most probably. Please visit this plugin's dashboard and scroll down. We have put a video guide there just now: How to Install Free SSL Certificate on cPanel Shared Hosting.</strong><br /><br />
                             Please find the SSL files at the locations given below (web hosting log in required to access) and install SSL manually with the help of your web hosting service provider. <em>It is recommended not to download the SSL files for security reason. Please copy the SSL locations and send the text to your web host.</em><br />";
@@ -197,8 +163,6 @@ class Email
         Issuer: ${issuerFull}<br /><br />";
         
         //$body .= "<br /><br />";
-        
-        $body .= $this->add_review_request_in_email(); /* Review display option @since 1.1.0 */
         
         $body .= $this->add_email_signature();        
         $body .= "</body></html>";
