@@ -4,11 +4,8 @@
  * @package Auto-Install Free SSL
  * This package is a WordPress Plugin. It issues and installs free SSL certificates in cPanel shared hosting with complete automation.
  *
- * @author Free SSL Dot Tech <support@freessl.tech>
- * @copyright  Copyright (C) 2019-2020, Anindya Sundar Mandal
+ * @author Auto-Install Free SSL
  * @license    http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License, version 3
- * @link       https://freessl.tech
- * @since      Class available since Release 1.0.0
  *
  *
  *   This program is free software: you can redistribute it and/or modify
