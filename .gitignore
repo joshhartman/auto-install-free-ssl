@@ -11,3 +11,6 @@ desktop.ini
 
 # Dependencies / build
 node_modules/
+
+# Build output
+*.zip
