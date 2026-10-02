@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build plugin zip
+        run: |
+          PLUGIN="auto-install-free-ssl"
+          VERSION="${GITHUB_REF_NAME#v}"
+          OUT="${PLUGIN}.${VERSION}.zip"
+          git archive --format=zip --prefix="${PLUGIN}/" -o "$OUT" HEAD
+          echo "OUT=$OUT" >> "$GITHUB_ENV"
+
+      - name: Extract changelog for this version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          awk -v ver="$VERSION" '
+            /^== / { in_changelog = ($0 ~ /Changelog/) }
+            in_changelog && $0 == "= " ver " =" { found=1; next }
+            found && /^= |^== / { exit }
+            found { print }
+          ' readme.txt > release-notes.md
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -s release-notes.md ]; then
+            gh release create "$GITHUB_REF_NAME" "$OUT" --title "$GITHUB_REF_NAME" --notes-file release-notes.md
+          else
+            gh release create "$GITHUB_REF_NAME" "$OUT" --title "$GITHUB_REF_NAME" --generate-notes
+          fi
