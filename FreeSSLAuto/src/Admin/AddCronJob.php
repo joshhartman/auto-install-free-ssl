@@ -4,10 +4,8 @@
  * @package Auto-Install Free SSL
  * This package is a WordPress Plugin. It issues and installs free SSL certificates in cPanel shared hosting with complete automation.
  *
- * @author Free SSL Dot Tech <support@freessl.tech>
- * @copyright  Copyright (C) 2019-2020, Anindya Sundar Mandal
+ * @author Auto-Install Free SSL
  * @license    http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License, version 3
- * @link       https://freessl.tech
  * @since      Class available since Release 1.0.0
  *
  *
@@ -286,13 +284,6 @@ ERROR;
         	<iframe width="560" height="315" src="https://www.youtube.com/embed/AEwcWBWohXs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
         
-            <!-- Powered by -->
-            <br />
-            <div class="header-footer">
-              	<p>             
-              		<?php echo esc_html__("Need help", 'auto-install-free-ssl'); ?>? <a href="https://freessl.tech/free-ssl-certificate-for-wordpress-website/#help" target="_blank">Click here!</a> <span style="margin-left: 15%;"><?php echo esc_html__("For documentation", 'auto-install-free-ssl'); ?>, <a href="https://freessl.tech/free-ssl-certificate-for-wordpress-website/#documentation" target="_blank">click here</a>.</span>
-              	</p>          	
-          	</div> <!-- End Powered by -->
         
         <?php
     }

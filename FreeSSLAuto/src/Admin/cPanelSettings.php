@@ -4,10 +4,8 @@
  * @package Auto-Install Free SSL
  * This package is a WordPress Plugin. It issues and installs free SSL certificates in cPanel shared hosting with complete automation.
  *
- * @author Free SSL Dot Tech <support@freessl.tech>
- * @copyright  Copyright (C) 2019-2020, Anindya Sundar Mandal
+ * @author Auto-Install Free SSL
  * @license    http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License, version 3
- * @link       https://freessl.tech
  * @since      Class available since Release 1.0.0
  *
  *
@@ -93,7 +91,7 @@ class cPanelSettings
             
             $app_settings = aifs_get_app_settings();
             
-            $cPanel = new cPanel($app_settings['cpanel_host'], $app_settings['username'], $app_settings['password']);
+            $cPanel = new cPanel($app_settings['cpanel_host'], $app_settings['username'], $app_settings['api_token']);
             
             $request_uri = "https://".$app_settings['cpanel_host'].":2083/execute/DomainInfo/domains_data?format=hash";
             
@@ -155,13 +153,6 @@ class cPanelSettings
         echo '</form>'; ?>
                
             
-            <!-- Powered by -->
-            <br />
-            <div class="header-footer">
-              	<p>             
-              		<?php echo esc_html__("Need help", 'auto-install-free-ssl'); ?>? <a href="https://freessl.tech/free-ssl-certificate-for-wordpress-website/#help" target="_blank">Click here!</a> <span style="margin-left: 15%;"><?php echo esc_html__("For documentation", 'auto-install-free-ssl'); ?>, <a href="https://freessl.tech/free-ssl-certificate-for-wordpress-website/#documentation" target="_blank">click here</a>.</span>
-              	</p>          	
-          	</div> <!-- End Powered by -->
         
         <?php
         echo '</div>';
@@ -202,17 +193,9 @@ class cPanelSettings
             );
         
         add_settings_field(
-            'password',
-            __("Password of your cPanel <sup>(required)</sup>", 'auto-install-free-ssl'),
-            array( $this, 'password_callback' ),
-            'cpanel_settings_ais_admin',
-            'cpanel_settings_section_id'
-            );
-        
-        add_settings_field(
-            'confirm_password',
-            __("Confirm Password <sup>(required)</sup>", 'auto-install-free-ssl'),
-            array( $this, 'confirm_password_callback' ),
+            'api_token',
+            __("API Token of your cPanel <sup>(required)</sup>", 'auto-install-free-ssl'),
+            array( $this, 'api_token_callback' ),
             'cpanel_settings_ais_admin',
             'cpanel_settings_section_id'
             );
@@ -251,16 +234,10 @@ class cPanelSettings
             $new_input['username'] = sanitize_text_field($input['username']);
         }
         
-        //Password
-        if (isset($input['password'])) {
-            $password = sanitize_text_field($input['password']);
+        //API Token
+        if (isset($input['api_token'])) {
+            $new_input['api_token'] = $this->factory->encryptText(sanitize_text_field($input['api_token']));
         }
-        
-        if (isset($input['confirm_password'])) {
-            $confirm_password = sanitize_text_field($input['confirm_password']);
-        }
-                    
-        $new_input['password'] = $this->factory->encryptText($password);
         
         if (isset($input['send_security_notification'])) {
             $new_input['send_security_notification'] = (bool) filter_var($input['send_security_notification'], FILTER_SANITIZE_NUMBER_INT);
@@ -275,6 +252,8 @@ class cPanelSettings
     public function print_section_info()
     {
         echo esc_html__("Please provide your cPanel login details and click 'Save Changes' button", 'auto-install-free-ssl').".<br /><br />";
+
+        echo esc_html__("The API Token is required instead of the password. To create one, log in to your cPanel, go to 'Security' section and click 'Manage API Tokens'. Then click the 'Create' button, give the token a name and click 'Create' again. Copy the generated token and paste it in the 'API Token' field below.", 'auto-install-free-ssl')."<br /><br />";
         
         $cpanel_login_url = get_site_url(). ":2083";        
         echo "<span style='color: green;'>". sprintf(__("In case you don't know your cPanel login URL, please <a href='%s' target='_blank'>click here</a> and copy it from the address bar. <a href='%s' target='_blank'>This link</a> will open in a new window and may redirect to the cPanel login page.", 'auto-install-free-ssl'), $cpanel_login_url, $cpanel_login_url)."</span> ".esc_html__("If you face issue identifying the cPanel login URL, please contact your web hosting service provider.", 'auto-install-free-ssl')."<br />";
@@ -287,7 +266,7 @@ class cPanelSettings
     public function cpanel_host_callback()
     {
         printf(
-         '<input type="text" id="cpanel_host" name="cpanel_settings_auto_install_free_ssl[cpanel_host]" required="required" value="%s" placeholder="e.g: https://speedify.tech:2083" />',
+         '<input type="text" id="cpanel_host" name="cpanel_settings_auto_install_free_ssl[cpanel_host]" required="required" value="%s" placeholder="e.g: https://example.com:2083" />',
             isset($this->options['cpanel_host']) ? 'https://'.esc_attr($this->options['cpanel_host']).':2083' : ''
          );
     }
@@ -306,24 +285,13 @@ class cPanelSettings
     
     
     /**
-     * password
+     * api_token
      */
-    public function password_callback()
+    public function api_token_callback()
     {
         printf(
-            '<input type="password" id="password" name="cpanel_settings_auto_install_free_ssl[password]" required="required" value="%s" />',
-            isset($this->options['password']) ? esc_attr($this->factory->decryptText($this->options['password'])) : ''
-            );
-    }
-    
-    /**
-     * confirm_password
-     */
-    public function confirm_password_callback()
-    {
-        printf(
-            '<input type="password" id="confirm_password" name="cpanel_settings_auto_install_free_ssl[confirm_password]" required="required" value="%s" />',
-            isset($this->options['password']) ? esc_attr($this->factory->decryptText($this->options['password'])) : ''
+            '<input type="password" id="api_token" name="cpanel_settings_auto_install_free_ssl[api_token]" required="required" value="%s" />',
+            isset($this->options['api_token']) ? esc_attr($this->factory->decryptText($this->options['api_token'])) : ''
             );
     }
     

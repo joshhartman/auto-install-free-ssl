@@ -4,10 +4,8 @@
  * @package Auto-Install Free SSL
  * This package is a WordPress Plugin. It issues and installs free SSL certificates in cPanel shared hosting with complete automation.
  *
- * @author Free SSL Dot Tech <support@freessl.tech>
- * @copyright  Copyright (C) 2019-2020, Anindya Sundar Mandal
+ * @author Auto-Install Free SSL
  * @license    http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License, version 3
- * @link       https://freessl.tech
  * @since      Class available since Release 1.0.0
  *
  *
@@ -29,7 +27,6 @@
 namespace AutoInstallFreeSSL\FreeSSLAuto\Admin;
 
 use AutoInstallFreeSSL\FreeSSLAuto\Admin\Factory;
-use AutoInstallFreeSSL\FreeSSLAuto\Acme\Factory as AcmeFactory;
 use AutoInstallFreeSSL\FreeSSLAuto\Email;
 
 /**
@@ -42,10 +39,6 @@ class BasicSettings
      * Holds the values to be used in the fields callbacks
      */
     private $options;
-    
-    public $display_review;
-    
-    public $acmeFactory;
     
     /**
      * Start up
@@ -66,54 +59,9 @@ class BasicSettings
         add_action('admin_init', array( $this, 'basic_settings_page_init' ));
         add_action('admin_init', array( $this, 'do_output_buffer' )); //required for successful redirect
                 
-        /*          
-         * Review display option @since 1.1.0
-         * 
-         */
-        
-        if(isset($this->options['homedir'])){
-            
-            //initialize the Acme Factory class
-            $this->acmeFactory = new AcmeFactory($this->options['homedir'].'/'.$this->options['certificate_directory'], $this->options['acme_version'], $this->options['is_staging']);
-            
-            //get the path of SSL files
-            $certificates_directory = $this->acmeFactory->getCertificatesDir();
-            
-            if(is_dir($certificates_directory)){
-                
-                $factory =  new Factory();
-                
-                //get the domains for which SSL is present in the certificate directory
-                $all_domains = $factory->getExistingSslList($certificates_directory);
-                
-                //If at least one SSL cert exists in the $certificates_directory, set 'aifs_display_review' = 1 if this option doesn't exist
-                if (count($all_domains) > 0) {
-                    
-                    if(!get_option('aifs_display_review'))
-                        add_option('aifs_display_review', 1);
-                }
-            }
-        }
-        
-        
         if (is_admin()) {
             add_action( 'admin_notices', array( $this, 'aifs_display_admin_notice' ) );
         }
-        else{
-            //add_action( 'init', array( $this, 'aifs_display_admin_notice' ) );//Send the email even if the frontend page loaded : Not working
-        }
-                
-        add_action( 'admin_init', array( $this, 'aifs_admin_notice_handler' ) );
-        
-        /*          
-         * Announcement display option @since 2.2.2
-         * 
-         */
-        
-        if(!get_option('aifs_display_announcement')){
-            add_option('aifs_display_announcement', 1);
-        }
-               
     }
     
     
@@ -141,63 +89,40 @@ class BasicSettings
      * @since 2.1.1
      */
     public function aifs_display_admin_notice(){
-        
-        $display_review_request = true;
-        $cpanel_password_missing = false;
+
+        $cpanel_api_token_missing = false;
         $dns_api_credential_missing = false;
-        
+
         if(isset($this->options['homedir'])){
             $app_settings = aifs_get_app_settings();
-                        
+
             //Check cPanel settings
-            if($app_settings['is_cpanel'] && !empty($app_settings['cpanel_host']) && !empty($app_settings['username']) && !empty($app_settings['password'])){
-                
+            if($app_settings['is_cpanel'] && !empty($app_settings['cpanel_host']) && !empty($app_settings['username'])){
+
                 $factory =  new Factory();
-                $cpanel_password_decrypted = $factory->decryptText($app_settings['password']);
-                
-                if(empty($cpanel_password_decrypted)){
-                    $cpanel_password_missing = true;
-                    $display_review_request = false;
+                $cpanel_api_token_decrypted = isset($app_settings['api_token']) ? $factory->decryptText($app_settings['api_token']) : false;
+
+                if(empty($cpanel_api_token_decrypted)){
+                    $cpanel_api_token_missing = true;
                 }
             }
-            
+
             //Check DNS service provider settings
             if($app_settings['use_wildcard'] && isset($app_settings['dns_provider']) && is_array($app_settings['dns_provider']) && !empty($app_settings['dns_provider'][0]['api_credential'])){
-                
+
                 $factory =  new Factory();
                 $dns_api_credential_decrypted = $factory->decryptText($app_settings['dns_provider'][0]['api_credential']);
-                
+
                 if(empty($dns_api_credential_decrypted)){
                     $dns_api_credential_missing = true;
-                    $display_review_request = false;
                 }
-                
-            }
-            
-            $counter = (int)get_option('aifs_admin_notice_display_counter');
-            
-            if($counter % 3 == 0){
-                
-                $this->aifs_encryption_key_change_notification($cpanel_password_missing, $dns_api_credential_missing);
-            
-                $this->aifs_display_review_request($display_review_request);
-            }
-            else{
-                /*
-                 * Display announcement only if 'aifs_display_review' exists,
-                 * i.e., at least one SSL cert issued
-                 */
-                if(get_option('aifs_display_review') !== false){
 
-                    $this->aifs_display_announcement();
-                }
             }
-            
-            
-            $this->aifs_admin_notice_display_counter();
+
+            $this->aifs_encryption_key_change_notification($cpanel_api_token_missing, $dns_api_credential_missing);
         }
-        
-       
+
+
     }
     
     
@@ -206,15 +131,15 @@ class BasicSettings
      *
      * @since 2.1.1
      */
-    public function aifs_encryption_key_change_notification($cpanel_password_missing, $dns_api_credential_missing){
+    public function aifs_encryption_key_change_notification($cpanel_api_token_missing, $dns_api_credential_missing){
                         
-        $text = "<p><strong>" . AIFS_NAME . "</strong> ".__("encryption key has been changed during the recent update. So we are unable to retrieve your", 'auto-install-free-ssl' );
+        $text = "<p><strong>" . AIFS_NAME . "</strong> ".__("has been updated recently and is unable to retrieve your", 'auto-install-free-ssl' );
         
-        if($cpanel_password_missing){
-            $text .= __(" cPanel password", 'auto-install-free-ssl' );
+        if($cpanel_api_token_missing){
+            $text .= __(" cPanel API token", 'auto-install-free-ssl' );
         }
                 
-        if($cpanel_password_missing && $dns_api_credential_missing){            
+        if($cpanel_api_token_missing && $dns_api_credential_missing){            
             $text .= __(" and", 'auto-install-free-ssl' );            
         }
                 
@@ -226,11 +151,11 @@ class BasicSettings
         
         $text .= "<p>".__("Please update the", 'auto-install-free-ssl' )." ";
         
-        if($cpanel_password_missing){
+        if($cpanel_api_token_missing){
             $text .= " <a href='".get_site_url()."/wp-admin/admin.php?page=aifs_cpanel_settings'>".__("cPanel Settings", 'auto-install-free-ssl' )."</a> ";
         }
                 
-        if($cpanel_password_missing && $dns_api_credential_missing){
+        if($cpanel_api_token_missing && $dns_api_credential_missing){
             $text .= __("and", 'auto-install-free-ssl' )." ";
         }
                 
@@ -238,21 +163,21 @@ class BasicSettings
             $text .= " <a href='".get_site_url()."/wp-admin/admin.php?page=aifs_dns_service_providers'>".__("DNS Service Provider API Credential", 'auto-install-free-ssl' )."</a> ";
         }
         
-        $text .= __("once again, provide the password/credential and click 'Save Changes'", 'auto-install-free-ssl' ) . ".</p>";
+        $text .= __("once again, provide the token/credential and click 'Save Changes'", 'auto-install-free-ssl' ) . ".</p>";
                         
         $text .= "<p>". __("We are extremely sorry for the inconvenience caused", 'auto-install-free-ssl' ).".</p>";
         
         
-        if ($cpanel_password_missing || $dns_api_credential_missing){
+        if ($cpanel_api_token_missing || $dns_api_credential_missing){
             
             echo '<div class="notice notice-error">'.$text.'</div>';
             
         }
         
         
-        if ($cpanel_password_missing || $dns_api_credential_missing){
+        if ($cpanel_api_token_missing || $dns_api_credential_missing){
             //Add more text for email
-            $text .= "<p>". __("For your information, we encrypt your password/credentials with the encryption key and save it in your database. We decrypt them using the same encryption key to issue/install free SSL certificates. Due to the change in the encryption key, we are currently unable to retrieve them.", 'auto-install-free-ssl' )."</p>";
+            $text .= "<p>". __("For your information, we encrypt your token/credentials with the encryption key and save it in your database. We decrypt them using the same encryption key to issue/install free SSL certificates. Due to the change in the encryption key, we are currently unable to retrieve them.", 'auto-install-free-ssl' )."</p>";
             
             //send the email (once in a week until the required action)
             $email = new Email();
@@ -261,187 +186,6 @@ class BasicSettings
         
     }
     
-    
-    
-    /**
-     * Display review request
-     * 
-     * @since 1.1.0
-     */
-    public function aifs_display_review_request($display_review_request){
-        
-        //Get the value of aifs_display_review
-        $display_review = get_option( 'aifs_display_review' );
-        
-        if ($display_review_request && $display_review != false && $display_review == 1 ){
-            
-            $admin_email = get_option('admin_email');        
-            $admin = get_user_by('email', $admin_email);
-            $admin_first_name = $admin->first_name;
-            
-            $already_done = wp_nonce_url( get_site_url().$_SERVER['REQUEST_URI'], 'aifs_reviewed', 'aifsrated' );
-            $remind_later = wp_nonce_url( get_site_url().$_SERVER['REQUEST_URI'], 'aifs_review_later', 'aifslater' );
-            $html = '<div class="notice notice-success aifs-review">
-			<div class="aifs-review-box">
-			  <img class="aifs-notice-img-left" src="' . AIFS_URL . 'assets/img/icon.jpg" />
-			  <p>' . __('Hey', 'auto-install-free-ssl' ) .' '.$admin_first_name. ', <strong>' . AIFS_NAME . '</strong> ' . __( 'has saved 			your $$$ by providing Free SSL Certificates and will save more. Could you please do me a BIG favor and give it a 5-star 		rating on WordPress? To help me spread the word and boost my motivation.', 'auto-install-free-ssl' ) . ' <br />~Anindya</p>
-			</div>
-			<a class="aifs-review-now aifs-review-button" href="https://wordpress.org/support/plugin/auto-install-free-ssl/reviews/#new-post" target="_blank">' . esc_html__( 'Sure! You Deserve It.', 'auto-install-free-ssl' ) . '</a>
-			<a class="aifs-review-button" href="' . $already_done . '" rel="nofollow" onclick="return confirm(\'Are you sure you have reviewed '.AIFS_NAME.' plugin?\')">' . esc_html__( 'I have done', 'auto-install-free-ssl' ) . '</a>
-			<a class="aifs-review-button" href="' . $remind_later . '" rel="nofollow" onclick="return confirm(\'Are you sure you need '.AIFS_NAME.' to remind you later?\')">' . esc_html__( 'Remind me later', 'auto-install-free-ssl' ) . '</a>
-		      </div>';
-            echo  $html ;
-        }        
-    }
-    
-    
-    /**
-     * Display announcement
-     * 
-     * @since 2.2.2
-     */
-    public function aifs_display_announcement(){
-        
-        //Get the value of aifs_display_announcement
-        $display_announcement = get_option( 'aifs_display_announcement' );
-        
-        if ($display_announcement !== false && $display_announcement == 1 ){
-            
-            $admin_email = get_option('admin_email');        
-            $admin = get_user_by('email', $admin_email);
-            $admin_first_name = $admin->first_name;
-            
-            $already_read = wp_nonce_url( get_site_url().$_SERVER['REQUEST_URI'], 'aifs_announcement_already_read', 'aifsannouncementdone' );
-            $remind_later = wp_nonce_url( get_site_url().$_SERVER['REQUEST_URI'], 'aifs_announcement_read_later', 'aifsannouncementlater' );
-                        
-            $html = '<div class="notice notice-warning aifs-review">
-                    <div class="aifs-review-box">                      
-                      <p>' . __('Hello', 'auto-install-free-ssl' ) .' '.$admin_first_name. '; <span style="color: #ffb900;">' . __( 'we are going to restructure the features of ', 'auto-install-free-ssl' ) . '<strong>' . AIFS_NAME . '.</strong></span><br />' . __( 'Please take a moment to read our announcement regarding the Survival challenge and the solution [premium version].', 'auto-install-free-ssl' ) . '</p>
-                      <img class="aifs-notice-img-right" src="' . AIFS_URL . 'assets/img/icon.jpg" />
-                    </div>
-                    <a class="aifs-review-now aifs-review-button" href="https://freessl.tech/blog/auto-install-free-ssl-needs-your-help-to-survive" target="_blank">' . esc_html__( 'Read Announcement', 'auto-install-free-ssl' ) . '</a>
-                    <a class="aifs-review-button" href="' . $already_read . '" rel="nofollow" onclick="return confirm(\'Are you sure you have read the Announcement regarding the Premium Version of '.AIFS_NAME.' plugin?\')">' . esc_html__( 'I have already read', 'auto-install-free-ssl' ) . '</a>
-                    <a class="aifs-review-button" href="' . $remind_later . '" rel="nofollow" onclick="return confirm(\'Are you sure you need '.AIFS_NAME.' to remind you later to read the Announcement regarding the Premium Version?\')">' . esc_html__( 'Remind me later', 'auto-install-free-ssl' ) . '</a>
-                                      
-                    </div>';
-            
-            echo  $html ;
-        }        
-    }
-    
-    
-    /**
-     * Execute admin notice actions
-     *
-     * @since 1.1.0 (renamed since 2.2.2)
-     */
-    public function aifs_admin_notice_handler()
-    {
-        
-        //Review
-        if ( isset( $_GET['aifsrated'] ) ) {
-            if ( !wp_verify_nonce( $_GET['aifsrated'], 'aifs_reviewed' ) ) {
-                wp_die( 'Access denied' );
-            }
-            update_option( 'aifs_display_review', 0);
-            wp_redirect($this->aifs_remove_parameters_from_url(get_site_url().$_SERVER['REQUEST_URI'], ['aifsrated']));
-        } else {
-            
-            if ( isset( $_GET['aifslater'] ) ) {
-                if ( !wp_verify_nonce( $_GET['aifslater'], 'aifs_review_later' ) ) {
-                    wp_die( 'Access denied' );
-                }
-                update_option( 'aifs_display_review', 5);
-                wp_schedule_single_event(strtotime("+5 days", time()), 'aifs_display_review_init' );
-                wp_redirect($this->aifs_remove_parameters_from_url(get_site_url().$_SERVER['REQUEST_URI'], ['aifslater']));
-            }
-            
-        }
-        
-        //Announcement
-        if ( isset( $_GET['aifsannouncementdone'] ) ) {
-            if ( !wp_verify_nonce( $_GET['aifsannouncementdone'], 'aifs_announcement_already_read' ) ) {
-                wp_die( 'Access denied' );
-            }
-            update_option( 'aifs_display_announcement', 0);
-            wp_redirect($this->aifs_remove_parameters_from_url(get_site_url().$_SERVER['REQUEST_URI'], ['aifsannouncementdone']));
-        } else {
-            
-            if ( isset( $_GET['aifsannouncementlater'] ) ) {
-                if ( !wp_verify_nonce( $_GET['aifsannouncementlater'], 'aifs_announcement_read_later' ) ) {
-                    wp_die( 'Access denied' );
-                }
-                update_option( 'aifs_display_announcement', 5);
-                wp_schedule_single_event(strtotime("+3 days", time()), 'aifs_display_announcement_init' );
-                wp_redirect($this->aifs_remove_parameters_from_url(get_site_url().$_SERVER['REQUEST_URI'], ['aifsannouncementlater']));
-            }
-            
-        }
-        
-    }
-    
-
-    /**
-     * Admin notice display counter. Required to display more than one admin notices alternately
-     * 
-     * @since 2.2.2
-     */
-    public function aifs_admin_notice_display_counter() {
-        
-        if(!get_option('aifs_admin_notice_display_counter')){
-            add_option('aifs_admin_notice_display_counter', 1);
-        }
-        else{
-            $counter = get_option('aifs_admin_notice_display_counter') < 99999999 ? get_option('aifs_admin_notice_display_counter') : 0; //if equal to 99999999, reset to 0
-            update_option('aifs_admin_notice_display_counter', ($counter+1));
-        }
-    }
-    
-    
-    /**
-     * Remove parameters from a given URL
-     * 
-     * @param string $url
-     * @param array $exclude_parameters
-     * 
-     *  @since 2.2.2
-     */
-    public function aifs_remove_parameters_from_url($url, $exclude_parameters){
-        
-        $url_parts = explode('?', $url);
-        
-        if(empty($url_parts[1])){
-            return $url;
-        }
-        
-        $query_string = $url_parts[1];
-        
-        $query_parameters = explode('&', $query_string);
-        
-        $query_parameters_filtered = [];
-        
-        foreach ($query_parameters as $parameter){
-            
-            if(!empty($parameter)){
-            
-                $parameter_key_value = explode('=', $parameter);
-
-                if(!in_array($parameter_key_value[0], $exclude_parameters)){
-
-                    $query_parameters_filtered[] = $parameter;
-                }
-            }
-        }
-        
-        
-        if(count($query_parameters_filtered) > 0){
-            return $url_parts[0].'?'.implode('&', $query_parameters_filtered);
-        }
-        else{
-            return $url_parts[0];
-        }
-        
-    }
     
     
     /**
@@ -504,13 +248,6 @@ ENTRY;
             
         echo '</form>'; ?>
                         
-            <!-- Powered by -->
-            <br />
-            <div class="header-footer">
-              	<p>             
-              		<?php echo esc_html__("Need help", 'auto-install-free-ssl'); ?>? <a href="https://freessl.tech/free-ssl-certificate-for-wordpress-website/#help" target="_blank">Click here!</a> <span style="margin-left: 15%;"><?php echo esc_html__("For documentation", 'auto-install-free-ssl'); ?>, <a href="https://freessl.tech/free-ssl-certificate-for-wordpress-website/#documentation" target="_blank">click here</a>.</span>
-              	</p>          	
-          	</div> <!-- End Powered by -->
                     
         <?php
             echo '</div>';
@@ -654,13 +391,6 @@ ENTRY;
             'basic_settings_section_id'
             );
         
-        add_settings_field(
-            'agree_to_freessl_tech_tos_pp',
-            __('I agree to the FreeSSL.tech <a href="https://freessl.tech/terms-of-service" target="_blank">Terms of Service</a> and <a href="https://freessl.tech/privacy-policy" target="_blank">Privacy Policy</a> <sup>(required)</sup>', 'auto-install-free-ssl'),
-            array( $this, 'agree_to_freessl_tech_tos_pp_callback' ),
-            'basic_settings_ais_admin',
-            'basic_settings_section_id'
-            );
     }
 
     /**
@@ -735,9 +465,6 @@ ENTRY;
             $new_input['agree_to_le_terms'] = sanitize_text_field($input['agree_to_le_terms']);
         }
          
-        if (isset($input['agree_to_freessl_tech_tos_pp'])) {
-            $new_input['agree_to_freessl_tech_tos_pp'] = sanitize_text_field($input['agree_to_freessl_tech_tos_pp']);
-        }
             
         return $new_input;
     }
@@ -966,16 +693,6 @@ ENTRY;
     }
     
     
-    /**
-     * agree_to_freessl_tech_tos_pp
-     */
-    public function agree_to_freessl_tech_tos_pp_callback()
-    {
-        ?>
-        <input type="checkbox" id="agree_to_freessl_tech_tos_pp" name="basic_settings_auto_install_free_ssl[agree_to_freessl_tech_tos_pp]" required="required"<?php echo (isset($this->options['agree_to_freessl_tech_tos_pp']) && 'on' === $this->options['agree_to_freessl_tech_tos_pp']) ? ' checked' : null; ?> />
-        
-        <?php
-    }
     
     /**
      * required for successful redirect

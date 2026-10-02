@@ -505,7 +505,7 @@ class Controller
         $lastElement = \count($sansArrayWildcard) - 1;
 
         foreach ($sansArrayWildcard as $key => $san) {
-            $baseDomain = str_replace('*', '', $san); //e.g.: .speedupwebsite.info
+            $baseDomain = str_replace('*', '', $san); //e.g.: .example.com
 
             if (false !== strpos($domain, $baseDomain)) {
                 //Probably $domain is belongs to the wildcard SSL

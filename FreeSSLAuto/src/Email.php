@@ -204,11 +204,11 @@ class Email
     
     /**
      * If the user provided cPanel credentials over unsecured connection (HTTP), send an email
-     * recommending password change and update the same in cPanel Settings.
+     * recommending API token re-creation and update the same in cPanel Settings.
      * 
      * @since 2.1.0
      */
-    public function send_cpanel_password_change_notification(){
+    public function send_cpanel_credential_change_notification(){
         
         $app_settings = aifs_get_app_settings();
         
@@ -231,7 +231,7 @@ class Email
             
             $body .= "Thanks for using '".AIFS_NAME."'.<br /><br />
                 
-                During configuring this WordPress plugin at <strong>$this_domain</strong> you provided cPanel password over simple HTTP, which is not
+                During configuring this WordPress plugin at <strong>$this_domain</strong> you provided cPanel API token over simple HTTP, which is not
                 a best practice from the security point of view. Data travels the internet as plain text on HTTP.
                 On the other hand, on an HTTPS connection data travels with encryption.<br /><br />";
             
@@ -259,12 +259,10 @@ class Email
                     and you get the padlock in the browser address bar.</li>";
             }
             
-            $body .= "<li>Change your cPanel password.</li>
-                <li>Go to the 'cPanel settings' page of ".AIFS_NAME.", provide the changed cPanel password and submit.</li>
+            $body .= "<li>Revoke the cPanel API token you provided and create a new one in your cPanel ('Security' &gt; 'Manage API Tokens').</li>
+                <li>Go to the 'cPanel settings' page of ".AIFS_NAME.", provide the new cPanel API token and submit.</li>
                 </ol>
             That's it!<br /><br />";
-            
-            $body .= $this->add_review_request_in_email();
             
             $body .= $this->add_email_signature();
             $body .= "</body></html>";

@@ -4,10 +4,8 @@
  * @package Auto-Install Free SSL
  * This package is a WordPress Plugin. It issues and installs free SSL certificates in cPanel shared hosting with complete automation.
  *
- * @author Free SSL Dot Tech <support@freessl.tech>
- * @copyright  Copyright (C) 2019-2020, Anindya Sundar Mandal
+ * @author Auto-Install Free SSL
  * @license    http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License, version 3
- * @link       https://freessl.tech
  * @since      Class available since Release 1.0.0
  *
  *
@@ -119,13 +117,6 @@ class AddDomainSettings
         echo '</form>'; ?>
             
             
-            <!-- Powered by -->
-            <br />
-            <div class="header-footer">
-              	<p>             
-              		<?php echo esc_html__("Need help", 'auto-install-free-ssl'); ?>? <a href="https://freessl.tech/free-ssl-certificate-for-wordpress-website/#help" target="_blank">Click here!</a> <span style="margin-left: 15%;"><?php echo esc_html__("For documentation", 'auto-install-free-ssl'); ?>, <a href="https://freessl.tech/free-ssl-certificate-for-wordpress-website/#documentation" target="_blank">click here</a>.</span>
-              	</p>          	
-          	</div> <!-- End Powered by -->        
         <?php
         
         echo '</div>';
@@ -254,7 +245,7 @@ class AddDomainSettings
         echo '<div id="domain">';
         
         printf(
-            '<input type="text" id="domain" name="all_domains_auto_install_free_ssl[domain]" value="%s" placeholder="e.g. speedupwebsite.info" required="required" />',
+            '<input type="text" id="domain" name="all_domains_auto_install_free_ssl[domain]" value="%s" placeholder="e.g. example.com" required="required" />',
             isset($this->domain) ? esc_attr($this->domain) : ''
             );
         
@@ -270,7 +261,7 @@ class AddDomainSettings
         echo '<div id="serveralias">';
         
         printf(
-            '<textarea class="form-control" id="serveralias" name="all_domains_auto_install_free_ssl[serveralias]" required="required" rows="5" cols="70" placeholder="www.speedupwebsite.info mail.speedupwebsite.info" >%s</textarea>',
+            '<textarea class="form-control" id="serveralias" name="all_domains_auto_install_free_ssl[serveralias]" required="required" rows="5" cols="70" placeholder="www.example.com mail.example.com" >%s</textarea>',
             isset($this->serveralias) ? esc_attr($this->serveralias) : ''
             );
         

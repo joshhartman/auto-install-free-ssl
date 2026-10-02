@@ -4,10 +4,8 @@
  * @package Auto-Install Free SSL
  * This package is a WordPress Plugin. It issues and installs free SSL certificates in cPanel shared hosting with complete automation.
  *
- * @author Free SSL Dot Tech <support@freessl.tech>
- * @copyright  Copyright (C) 2019-2020, Anindya Sundar Mandal
+ * @author Auto-Install Free SSL
  * @license    http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License, version 3
- * @link       https://freessl.tech
  * @since      Class available since Release 1.0.0
  *
  *
@@ -85,7 +83,7 @@ class DnsApi
                 if ('cpanel' === $dns_provider_name) {
                     //check if cPanel login details provided.
                     if ($this->cPanel['is_cpanel']) {
-                        $dnsapi = new cPanel($this->cPanel['cpanel_host'], $this->cPanel['username'], $this->cPanel['password']);
+                        $dnsapi = new cPanel($this->cPanel['cpanel_host'], $this->cPanel['username'], $this->cPanel['api_token']);
 
                         $result = $dnsapi->setDnsTxt($domain, $txt_name, $txt_value);
                     } else {
@@ -115,13 +113,13 @@ class DnsApi
             //Manual option selected
             $subject = 'Please manually add this DNS TXT record on '.$domain;
 
-            $body .= "We are sorry, your DNS provider is not supported by <a href='https://freessl.tech'>Auto-Install Free SSL</a>.<br /><br />";
+            $body .= "We are sorry, your DNS provider is not supported by Auto-Install Free SSL.<br /><br />";
             $body .= '<strong>Please manually add the following DNS TXT record on '.$domain.'.</strong><br /><br />';
         } elseif (200 === $result['http_code']) {
             //Success
             $subject = "'Auto-Install Free SSL' added DNS TXT record on ".$domain." successfully";
 
-            $body .= "<h2><a href='https://freessl.tech'>Auto-Install Free SSL</a> added DNS TXT record on ".$domain.' successfully</h2><br />';
+            $body .= "<h2>Auto-Install Free SSL added DNS TXT record on ".$domain.' successfully</h2><br />';
             $body .= '<strong>No further action required by you.</strong><br /><br />
                  For your information, TXT record details given below:<br /><br />';
         } else {
@@ -130,7 +128,7 @@ class DnsApi
 
             $body .= '<h2>Please add this DNS TXT record on '.$domain.' manually or check your DNS API credentials and try again.</h2><br />';
             $body .= 'Sorry, an unexpected error detected. HTTP code: '.$result['http_code'].".<br /><br />
-                Please check your DNS API credentials in the <strong>DNS Providers settings</strong> of your <a href='https://freessl.tech'>Auto-Install Free SSL</a> installation and try again.<br /><br />
+                Please check your DNS API credentials in the <strong>DNS Providers settings</strong> of your Auto-Install Free SSL installation and try again.<br /><br />
                 If you provided DNS API credentials properly but still getting this error, then please consider manually adding the TXT record.<br /><br />
                 <strong>TXT record details are given below:</strong><br /><br />";
         }
@@ -148,7 +146,7 @@ class DnsApi
         $body .= "Do not reply to this automated email.<br /><br />
         --------------<br />
         Auto-Install Free SSL<br />
-        Powered by <a href='https://speedify.tech/wordpress-website-speed-optimization-service'>SpeedUpWebsite.info</a> (WordPress website speed optimization service), <a href='https://getwww.me'>GetWWW.me</a> (beautiful WordPress website design service) and <a href='https://letsencrypt.org'>Let's Encrypt</a><br /><br />
+        Powered by <a href='https://letsencrypt.org'>Let's Encrypt</a><br /><br />
         </body></html>";
 
         //Send email to all admin email id

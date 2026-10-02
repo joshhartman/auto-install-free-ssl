@@ -4,10 +4,8 @@
  * @package Auto-Install Free SSL
  * This package is a WordPress Plugin. It issues and installs free SSL certificates in cPanel shared hosting with complete automation.
  *
- * @author Free SSL Dot Tech <support@freessl.tech>
- * @copyright  Copyright (C) 2019-2020, Anindya Sundar Mandal
+ * @author Auto-Install Free SSL
  * @license    http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License, version 3
- * @link       https://freessl.tech
  * @since      Class available since Release 1.0.0
  *
  *
@@ -355,7 +353,7 @@ class AcmeV2
 
                     $part = str_replace('.'.$registeredDomain, '', $sub_domain);
 
-                    //Domain should be the registered domain, for example, speedupwebsite.info instead of  mobile.estate.speedupwebsite.info and  TXT record name/host: should be  _acme-challenge.mobile.estate instead of   _acme-challenge
+                    //Domain should be the registered domain, for example, example.com instead of  blog.example.com and  TXT record name/host: should be  _acme-challenge.blog instead of   _acme-challenge
 
                     //DNS API connect
 

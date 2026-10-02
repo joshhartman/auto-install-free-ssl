@@ -295,10 +295,6 @@ class HomeOptions
 						<p><?= esc_html__("If you face issues after clicking this button, please revert to HTTP.", 'auto-install-free-ssl') ?>
 						<strong><?= esc_html__("Please don't worry, as soon as you click the button, we'll send you an automated email with a link. If you need to revert to HTTP, simply click that link.", 'auto-install-free-ssl') ?></strong>
 						<?= esc_html__("If you don't find that email in your inbox, please don't forget to check your spam folder.", 'auto-install-free-ssl') ?></p>
-						<p><?= esc_html__("But if the issue persists,", 'auto-install-free-ssl') ?>
-						<a href="https://freessl.tech/free-ssl-certificate-for-wordpress-website/#reverthttp" target="_blank"><?= esc_html__("click here", 'auto-install-free-ssl') ?></a>
-						<?= esc_html__("for documentation on more options on how to revert to HTTP.", 'auto-install-free-ssl') ?></p>
-        		
         				<?php 
         				if (isset($all_domains) && is_array($all_domains) && count($all_domains) > 1) {
         				    echo "<span style='color: #46b450;'>" . esc_html__("NOTE: Clicking this button activates force HTTPS on this website only. ", 'auto-install-free-ssl') . "</span>";

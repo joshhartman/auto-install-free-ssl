@@ -71,7 +71,7 @@ class FreeSSLAuto
 
         //Is the web hosting control panel cPanel?
         if ($this->appConfig['is_cpanel']) {
-            $cpanel = new cPanel($this->appConfig['cpanel_host'], $this->appConfig['username'], $this->appConfig['password']);
+            $cpanel = new cPanel($this->appConfig['cpanel_host'], $this->appConfig['username'], $this->appConfig['api_token']);
 
             $all_domains = $cpanel->allDomains();
                         
@@ -110,7 +110,7 @@ class FreeSSLAuto
                 'is_cpanel' => $this->appConfig['is_cpanel'],
                 'cpanel_host' => $this->appConfig['cpanel_host'],
                 'username' => $this->appConfig['username'],
-                'password' => $this->appConfig['password'],
+                'api_token' => $this->appConfig['api_token'],
             ];
         } else {
             $cPanel = [
@@ -195,10 +195,6 @@ class FreeSSLAuto
                     try {
                         if ($freessl->obtainSsl($domains_array, $single_domain['documentroot'], false, $this->appConfig['country_code'], $this->appConfig['state'], $this->appConfig['organization'])) {
                             
-                            //set 'aifs_display_review' = 1 if this option doesn't exist
-                            if(!get_option('aifs_display_review'))
-                                add_option('aifs_display_review', 1);
-                            
                             if ($ssl_installation_feature) {
                                 if (false === strpos($single_domain['domain'], '*.')) {
                                     //Install SSL. This returns false if there is any problem to install SSL
@@ -252,7 +248,7 @@ class FreeSSLAuto
             //This check is done within the function. @since 2.1.0
                
                 $email = new Email();
-                $email->send_cpanel_password_change_notification();                
+                $email->send_cpanel_credential_change_notification();                
             
             //At the end of the code, compare the current microtime to the microtime that we stored at the beginning of the script.
             $executionEndTime = microtime(true);
@@ -262,8 +258,7 @@ class FreeSSLAuto
 
             //Print it with the log
             $logger->log('This script took '.$seconds.' seconds to execute.');
-            $logger->log("Powered by https://GetWWW.me (Beautiful WordPress website design service), https://SpeedUpWebsite.info (WordPress website speed optimization service) and Let's Encrypt");
-            $logger->log(AIFS_NAME . ' (https://freessl.tech)');
+            $logger->log('Powered by ' . AIFS_NAME . " and Let's Encrypt");
         }
 
         //Change Let's Encrypt account key / Account key roll-over

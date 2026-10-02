@@ -2,10 +2,10 @@
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Tags: ssl,https,free ssl,ssl certificate,mixed content
-Requires at least: 4.1
-Tested up to: 5.9
-Stable tag: 2026.1.0
-Requires PHP: 5.6
+Requires at least: 7.0
+Tested up to: 7.1
+Stable tag: 2026.2.0
+Requires PHP: 8.2
 
 WordPress plugin to automate issue & install free SSL certificates (Let's Encrypt), one-click force HTTPS redirect, fix insecure mixed content.
 
@@ -35,12 +35,12 @@ This WordPress plugin works on other web hosting control panels also, except for
 * This WordPress plugin saves the SSL certificates and private keys files above the document root (i.e., 'public_html').
 * You have the option to set the directory name in which this plugin saves SSL certificates and private keys.
 * Set the key length of SSL certificate as per your wish. The default value is 2048 bytes/bit.
-* The plugin saves the sensitive information (password/API secret) in your WordPress database encrypting with the open SSL.
+* The plugin saves the sensitive information (API token/API secret) in your WordPress database encrypting with the open SSL.
 * There is an option to create a daily cron job with one click — no need to log in your web hosting control panel.
 * Do you need to issue wildcard SSL? You get four DNS service providers for which the plugin sets DNS TXT record automatically: Cloudflare, Godaddy, Namecheap, and cPanel. If your DNS provider is not supported, you have option to set the DNS TXT record yourself. At the right time, this WordPress plugin sends an email that provides the required data to set the DNS TXT record.
 * If the WordPress plugin automatically sets the DNS TXT record, it waits for 2 minutes before it sends challenges to the API of Let’s Encrypt for verification of your domains. If your DNS provider takes more than 2 minutes to propagate the TXT records, you have the option to make the plugin wait beyond two minutes interval.
 * If you set the DNS TXT record manually, the plugin waits until the TXT record propagation complete. Some web hosting company may terminate the cron job if the DNS service provider takes longer to complete propagation. In that situation, you may wait until the next run of the cron job or choose non-wildcard SSL for each sub-domain.
-* If your website currently doesn't have an SSL certificate installed, this WordPress plugin provides an option to generate one free SSL certificate even before you configure the plugin. You get this option when you try to provide cPanel password or DNS API credentials over an insecure connection. So, no need to enter sensitive credentials on an insecure page.
+* If your website currently doesn't have an SSL certificate installed, this WordPress plugin provides an option to generate one free SSL certificate even before you configure the plugin. You get this option when you try to provide cPanel API token or DNS API credentials over an insecure connection. So, no need to enter sensitive credentials on an insecure page.
 * You can revoke any SSL certificate or change your Let's Encrypt™ account key at any time.
 * Fix insecure links & mixed content warnings and display the padlock with a single click.
 * One-click revert to HTTP if required.
@@ -49,8 +49,8 @@ This WordPress plugin works on other web hosting control panels also, except for
 #### Minimum System Requirements
 
 * Linux hosting (Windows hosting is not supported)
-* WordPress 4.1
-* PHP 5.6
+* WordPress 7.0
+* PHP 8.2
 * OpenSSL extension
 * Curl extension
 * PHP directive allow_url_fopen = On
@@ -91,17 +91,17 @@ For any of the case 1 and 2, all other processes are automated. The plugin sends
 
 == Frequently Asked Questions ==
 
-= Why do you need my cPanel password when others Let's Encrypt clients don’t? =
+= Why do you need my cPanel API token when others Let's Encrypt clients don’t? =
 
-cPanel username and password is required to install the free SSL certificate automatically with the cPanel API. Let's Encrypt SSL's lifetime is 90 days. You need to get and install another SSL certificate before the expiration of the current SSL. If you provide your cPanel username and password, this plugin will do this repeated job automatically. All your credentials remain safe in your database. Moreover, 'Auto-Install Free SSL'  encrypts the password before saving in your database.
+cPanel username and API token is required to install the free SSL certificate automatically with the cPanel API. You can create an API token in your cPanel under 'Security' > 'Manage API Tokens'. Let's Encrypt SSL's lifetime is 90 days. You need to get and install another SSL certificate before the expiration of the current SSL. If you provide your cPanel username and API token, this plugin will do this repeated job automatically. All your credentials remain safe in your database. Moreover, 'Auto-Install Free SSL'  encrypts the API token before saving in your database.
 
 All other Let's Encrypt clients who auto-install free SSL certificate, needs root access, which is a higher privilege than the cPanel user. In shared hosting, the root access belongs to the web hosting company. So those clients will not work on shared hosting.
 
-= Does this WordPress plugin send the cPanel username or cPanel password to your server or to Let's Encrypt? =
+= Does this WordPress plugin send the cPanel username or cPanel API token to your server or to Let's Encrypt? =
 
 We or Let's Encrypt don't collect any credentials. **This plugin’s source code is open for audit.** The team WordPress approved it after the audit. Please feel free to audit yourself too.
 
-If you still hesitate for the password, please set the cPanel option to NO (in basic settings). You still get the SSL certificate and automated renewal. But you need to install the generated SSL manually. You need to provide all your domain information manually too.
+If you still hesitate for the API token, please set the cPanel option to NO (in basic settings). You still get the SSL certificate and automated renewal. But you need to install the generated SSL manually. You need to provide all your domain information manually too.
 
 = I installed 'Auto-Install Free SSL' and did everything. But the SSL certificate was not issued. What should I do? =
 
@@ -123,6 +123,13 @@ Make sure you have provided your email in the 'Cron Email' section of the Cron J
 Let's Encrypt™ is a trademark of the Internet Security Research Group. All rights reserved.
 
 == Changelog ==
+
+= 2026.2.0 =
+* Improvement: cPanel authentication now uses cPanel API tokens instead of the cPanel account password. You can create an API token in your cPanel under 'Security' > 'Manage API Tokens'. This plugin no longer needs or stores your cPanel password.
+* Note: If you configured the cPanel Settings before this update, please create an API token in your cPanel and provide it on the 'cPanel Settings' page of this plugin.
+* Improvement: DNS TXT records are now added using the modern cPanel UAPI (ZoneEdit/add_zone_record). The legacy XML-API client library has been removed.
+* Fix: cPanel API calls now have connection timeouts, so the plugin no longer hangs if your cPanel is unreachable.
+* Removed: third-party promotional notices, review requests, announcements, and external documentation links. The plugin no longer requires agreeing to any third-party terms of service beyond the Let's Encrypt Subscriber Agreement.
 
 = 2026.1.0 =
 * Fix: The CA bundle now always includes the root certificate. Previously, only the intermediate certificate was included in the CA bundle, which caused installation failures on hosting servers (including cPanel servers) where the root certificate was not present in the local trust store. This fix also ensures correct handling of Let's Encrypt's newer Generation Y chains, which can contain more than three certificates.

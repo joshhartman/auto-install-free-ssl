@@ -4,7 +4,7 @@
  * 
  * Plugin Name: Auto-Install Free SSL
  * Description: This plugin automatically issues and installs free SSL certificates in cPanel shared hosting. You need only a few clicks to set it up. Cost $000
- * Version:     2026.1.0
+ * Version:     2026.2.0
  * Author:      Auto-Install Free SSL
  * License:     GNU General Public License, version 3
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -323,30 +323,6 @@ ENTRY;
         
         wp_enqueue_script('aifs_custom_script', AIFS_URL . 'assets/js/script.js', array('jquery'));
     }
-    
-    
-    /**
-     * Set review option to 1 to display the review request
-     *
-     * @since 1.1.0
-     */
-    function aifs_set_display_review_option()
-    {
-        update_option( 'aifs_display_review', 1 );
-    }
-    add_action('aifs_display_review_init', 'aifs_set_display_review_option');
-    
-    
-    /**
-     * Set announcement option to 1 to display the announcement request again
-     *
-     * @since 2.2.2
-     */
-    function aifs_set_display_announcement_option()
-    {
-        update_option( 'aifs_display_announcement', 1 );
-    }
-    add_action('aifs_display_announcement_init', 'aifs_set_display_announcement_option');
     
     
     /**

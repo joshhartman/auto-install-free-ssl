@@ -32,7 +32,7 @@ class cPanel
 {
     private $cpanel_host;
     private $username;
-    private $password;
+    private $api_token;
     private $logger;
 
     /**
@@ -40,16 +40,16 @@ class cPanel
      *
      * @param string $cpanel_host
      * @param string $username
-     * @param string $password
+     * @param string $api_token Encrypted cPanel API token
      */
-    public function __construct($cpanel_host, $username, $password)
+    public function __construct($cpanel_host, $username, $api_token)
     {
         $this->cpanel_host = $cpanel_host;
         $this->username = $username;
 
         $adminFactory = new AdminFactory();
 
-        $this->password = $adminFactory->decryptText($password);
+        $this->api_token = $adminFactory->decryptText($api_token);
         $this->logger = new Logger();
     }
 
@@ -150,8 +150,6 @@ class cPanel
         $key_file = realpath($domainPath.DS.'private.pem');
         $cabundle_file = realpath($domainPath.DS.'cabundle.pem');
 
-        // Declare your username and password of the cPanel for authentication.
-
         // Define the API call.
         $request_uri = 'https://'.$this->cpanel_host.':2083/execute/SSL/install_ssl';
 
@@ -197,10 +195,13 @@ class cPanel
     {
         // Set up the cURL request object.
         $ch = curl_init($request_uri);
-        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_setopt($ch, CURLOPT_USERPWD, $this->username.':'.$this->password);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: cpanel '.$this->username.':'.$this->api_token,
+        ]);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
 
         if (null !== $payload) {
             // Set up a POST request with the payload.
@@ -219,7 +220,7 @@ class cPanel
     }
 
     /**
-     * Set DNS TXT record using Json API through cPanel XMLAPI.
+     * Set DNS TXT record using cPanel UAPI.
      *
      * @param string $domain
      * @param string $txt_name
@@ -229,50 +230,29 @@ class cPanel
      */
     public function setDnsTxt($domain, $txt_name, $txt_value)
     {
-        $xmlapi = new xmlapi($this->cpanel_host, $this->username, $this->password);
+        $request_uri = 'https://'.$this->cpanel_host.':2083/execute/ZoneEdit/add_zone_record?'.http_build_query([
+            'domain' => $domain,
+            'name' => $txt_name,
+            'type' => 'TXT',
+            'txtdata' => $txt_value,
+            'ttl' => '600',
+        ]);
 
-        $xmlapi->set_output('json');
+        $response = $this->connectUapi($request_uri);
 
-        $xmlapi->set_port('2083');
-
-        $xmlapi->set_debug(1);
-
-        $responce = $xmlapi->api2_query(
-            $this->username,
-            'ZoneEdit',
-            'add_zone_record',
-            [
-                'domain' => $domain,
-                'name' => $txt_name,
-                'type' => 'TXT',
-                'txtdata' => $txt_value,
-                'ttl' => '600',
-                'class' => 'IN',
-            ]
-            );
-
-        $responce_array = json_decode($responce, true);
+        // Newer cPanel versions may wrap the payload in a 'result' object
+        $status = isset($response->result) ? $response->result->status : (isset($response->status) ? $response->status : null);
 
         $result = [];
 
-        //Check status
-
-        $event_result = (bool) $responce_array['cpanelresult']['event']['result'];
-
-        $preevent_result = isset($responce_array['cpanelresult']['preevent']) ? (bool) $responce_array['cpanelresult']['preevent']['result'] : true; //Some cPanel doesn't provide this key. In that case, ignore it by setting 'true'.
-
-        $postevent_result = isset($responce_array['cpanelresult']['postevent']) ? (bool) $responce_array['cpanelresult']['postevent']['result'] : true; //Some cPanel doesn't provide this key. In that case, ignore it by setting 'true'.
-
-        if ($event_result && $preevent_result && $postevent_result) {
-            //$result['header'] = $response;
+        if ($status) {
             $result['http_code'] = 200;
-            $result['body'] = $responce_array;
+            $result['body'] = $response;
 
             $this->logger->log('Congrats! TXT record added successfully.');
         } else {
-            //$result['header'] = $response;
             $result['http_code'] = 404;
-            $result['body'] = $responce_array;
+            $result['body'] = $response;
 
             $this->logger->log('Sorry, the record was not added due to an error');
         }

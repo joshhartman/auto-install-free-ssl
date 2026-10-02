@@ -4,10 +4,8 @@
  * @package Auto-Install Free SSL
  * This package is a WordPress Plugin. It issues and installs free SSL certificates in cPanel shared hosting with complete automation.
  *
- * @author Free SSL Dot Tech <support@freessl.tech>
- * @copyright  Copyright (C) 2019-2020, Anindya Sundar Mandal
+ * @author Auto-Install Free SSL
  * @license    http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License, version 3
- * @link       https://freessl.tech
  * @since      Class available since Release 1.0.0
  *
  *
@@ -303,10 +301,6 @@ class ForceSSL
                                     
                 if (update_option('aifs_force_ssl', $force_ssl ) ) {
                     
-                    //set 'aifs_display_review' = 1 if this option doesn't exist
-                    if(!get_option('aifs_display_review'))
-                        add_option('aifs_display_review', 1);
-                    
                     if($force_ssl == 1){
                         
                         $revert_nonce = uniqid('aifs').time().uniqid();
@@ -380,9 +374,7 @@ class ForceSSL
         
         $body .= "<strong>". esc_html__("hardcoded URL", 'auto-install-free-ssl').", </strong> ";
         
-        $body .= esc_html__("if any, and fix it. Please contact us at", 'auto-install-free-ssl')." <em>support@freessl.tech</em> ";
-        
-        $body .= esc_html__("for any help", 'auto-install-free-ssl').".<br /><br />";
+        $body .= esc_html__("if any, and fix it.", 'auto-install-free-ssl')."<br /><br />";
         
         
         $body .= esc_html__("If the SSL certificate has not been installed properly, or if an invalid SSL certificate installed on your website, you may face issues. Your WordPress website may be inaccessible too. In that case please click the link given below to deactivate force HTTPS and revert to HTTP.", 'auto-install-free-ssl')."<br />";
@@ -391,14 +383,9 @@ class ForceSSL
         
         $body .= esc_html__("Clicking the above link will instantly deactivate force HTTPS and revert your website to HTTP", 'auto-install-free-ssl').".<br /><br />";
         
-        $body .= esc_html__("But if the issue persists", 'auto-install-free-ssl').", ";
-        
-        $body .= '<a href="https://freessl.tech/free-ssl-certificate-for-wordpress-website/#reverthttp">' . esc_html__("click here", 'auto-install-free-ssl')."</a> ";
-        
-        $body .= esc_html__("for documentation on more options on how to revert to HTTP", 'auto-install-free-ssl').".<br /><br />";
+        $body .= "<br />";
         
         $email = new Email();
-        $body .= $email->add_review_request_in_email();
         $body .= $email->add_email_signature();
                 
         $body .= "</body></html>";
