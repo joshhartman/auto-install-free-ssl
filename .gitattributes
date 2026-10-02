@@ -1,5 +1,4 @@
 /.gitignore       export-ignore
 /.gitattributes   export-ignore
 /.idea            export-ignore
-/build-zip.sh     export-ignore
 /.github          export-ignore
